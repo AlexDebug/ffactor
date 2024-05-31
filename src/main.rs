@@ -1,82 +1,11 @@
 use std::io::{self, IsTerminal, Write};
-use calc::prime;
 use clap::{Parser, Subcommand};
 
 #[macro_use] extern crate prettytable;
 use prettytable::{Table, Row, Cell};
 
 
-mod calc {
-    use std::collections::HashMap;
-
-    pub fn is_even(n: u128) -> bool {
-        n % 2 == 0
-    }
-
-    fn is_integer(f: f64) -> bool {
-        f.fract() == 0.0
-    }
-
-    pub fn is_square(n: u128) -> bool {
-        let r: f64 = (n as f64).sqrt();
-        is_integer(r)
-    }
-
-    pub fn is_triangle(n: u128) -> bool {
-        is_integer((8.0*(n as f64)+1.0).sqrt()/2.0-0.5)
-    }
-
-    fn fermat(n: u128) -> Vec<u128>{
-        let mut vec = Vec::new();
-
-        let mut a = (n as f64).sqrt().ceil() as u128;
-            while !is_square(a*a - n) {
-                a += 1;
-            }
-            let b = ((a*a-n) as f64).sqrt() as u128;
-        if (a-b) == 1 {
-            vec.push(a+b);
-            vec
-        } else {
-            for i in fermat(a+b) {
-                vec.push(i);
-            }
-            for i in fermat(a-b) {
-                vec.push(i);
-            }
-            vec
-        }
-
-
-    }
-
-    fn insert_or_sum(n: u128, map: &mut HashMap<u128,u128>) {
-        if map.contains_key(&n) {
-            *map.get_mut(&n).unwrap() += 1;
-        } else {
-            map.insert(n, 1);
-        }
-    } 
-
-    pub fn factorize(n: u128) -> HashMap<u128, u128> {
-        let mut factors: HashMap<u128, u128> = HashMap::new();
-        let mut n = n;
-        while is_even(n) {
-            insert_or_sum(2, &mut factors);
-            n = n/2
-        }
-
-        for k in fermat(n) {
-            insert_or_sum(k, &mut factors);
-        }
-            
-        factors
-    }
-
-    pub fn prime(n: u128) -> bool {
-        factorize(n).len() == 1 
-    }
-}
+mod calc;
 
 /// A small tool for number theory
 #[derive(Debug, Parser)]
@@ -179,7 +108,7 @@ fn main() {
             }
         }
         Commands::Prime { n } => {
-            let prime = prime(n) || n == 2;
+            let prime = calc::prime(n) || n == 2;
             if prime && is_terminal {
                 format!("The number {} is prime \n", n)
             } else if is_terminal {
@@ -197,25 +126,4 @@ fn main() {
 }
 
 #[cfg(test)]
-mod test {
-    use super::*;
-
-    #[test]
-    fn test_even() {
-        let even: [u128; 5] = [2, 4, 8, 6, 14];
-        let odd: [u128; 5] = [3, 5, 7, 9, 19];
-        for i in 0..5 {
-            assert_eq!(calc::is_even(even[i]), true);
-            assert_eq!(calc::is_even(odd[i]), false)
-        }
-    }
-    #[test]
-    fn test_square() {
-        let square: [u128; 3] = [4, 9, 16];
-        let no_square: [u128; 3] = [6, 8, 15];
-        for i in 0..3 {
-            assert_eq!(calc::is_square(square[i]), true);
-            assert_eq!(calc::is_square(no_square[i]), false)
-        }
-    }
-}
+mod test;
