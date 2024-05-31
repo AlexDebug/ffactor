@@ -13,9 +13,17 @@ mod calc {
         n % 2 == 0
     }
 
+    fn is_integer(f: f64) -> bool {
+        f.fract() == 0.0
+    }
+
     pub fn is_square(n: u128) -> bool {
         let r: f64 = (n as f64).sqrt();
-        r.fract() == 0.0
+        is_integer(r)
+    }
+
+    pub fn is_triangle(n: u128) -> bool {
+        is_integer((8.0*(n as f64)+1.0).sqrt()/2.0-0.5)
     }
 
     fn fermat(n: u128) -> Vec<u128>{
@@ -93,12 +101,17 @@ enum Commands {
          /// Number to test
         n: u128
     },
+    /// Test if n is trinagle
+    Triangle {
+        /// Number to test
+        n: u128
+    },
     /// Shows the prime factor descomposition of n
     Factor {
         /// Number to decompose
         n: u128
     },
-    /// Tells if a number is prime or not
+    /// Tells if n is prime
     Prime {
         n: u128
     },
@@ -130,6 +143,17 @@ fn main() {
                 format!("The number {} is square \n", n)
             } else if is_terminal {
                 format!("The number {} is not square \n", n)
+            } else {
+                if r { String::from("1 \n") } else { String::from("0 \n") }
+            }
+        }
+        Commands::Triangle { n } => {
+            let r = calc::is_triangle(n);
+
+            if  r && is_terminal {
+                format!("The number {} is triangle \n", n)
+            } else if is_terminal {
+                format!("The number {} is not triangle \n", n)
             } else {
                 if r { String::from("1 \n") } else { String::from("0 \n") }
             }
