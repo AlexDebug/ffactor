@@ -3,7 +3,7 @@ name = "ffactor"
 version = "0.1.0"
 edition = "2021"
 description = "A very minimal number theory utilities"
-licence = "MIT"
+license = "MIT"
 
 [dependencies]
 clap = { version = "4.5.4", features = ["derive"] }
