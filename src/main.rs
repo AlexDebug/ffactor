@@ -57,8 +57,7 @@ mod calc {
             insert_or_sum(2, &mut factors);
             n = n/2
         }
-        let mut ff = fermat(n);
-        ff.sort();
+
         for k in fermat(n) {
             insert_or_sum(k, &mut factors);
         }
@@ -137,24 +136,26 @@ fn main() {
         }
         Commands::Factor { n } => {
             let mut r = calc::factorize(n);
+            let mut keys = r.keys().collect::<Vec<_>>();
+            keys.sort();
 
             if is_terminal {
                 let mut table = Table::new();
                 table.add_row(row!["Primes", "Times"]);
-                for (k, v) in r.iter() {
-                    table.add_row(row![k, v]);
+                for k in keys {
+                    table.add_row(row![k, r[k]]);
                 }
                 table.to_string()
             } else {
                 let mut output = String::new();
-                for (k, v) in r.iter() {
-                    output.push_str(&format!("{} {} \n", k, v));
+                for k in keys {
+                    output.push_str(&format!("{} {} \n", k, r[k]));
                 }
                 output
             }
         }
         Commands::Prime { n } => {
-            let prime = prime(n);
+            let prime = prime(n) || n == 2;
             if prime && is_terminal {
                 format!("The number {} is prime \n", n)
             } else if is_terminal {
